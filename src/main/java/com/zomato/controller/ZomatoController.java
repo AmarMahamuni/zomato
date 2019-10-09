@@ -44,8 +44,7 @@ public class ZomatoController {
 	List<Restuarant> restuarntList=new ArrayList<>();
 	@GetMapping("/list/{city}")
 	public List<Restuarant> getCityDetails(@PathVariable String city) throws IOException, ParseException {
-		
-		
+		List<Restuarant> restuarntList=new ArrayList<>();
 		String entity_type = null;
 		Long entity_id = null;
 		Request city_request = new Request.Builder().url("https://developers.zomato.com/api/v2.1/locations?query=" + city)
@@ -58,6 +57,8 @@ public class ZomatoController {
 			JSONObject city_location = (JSONObject) city_location_suggestions.get(0);
 			entity_type = (String) city_location.get("entity_type");
 			entity_id = (Long) city_location.get("entity_id");
+			System.out.println(entity_type);
+			System.out.println(entity_id);
 		
 		
 		Request restuarnts_request = new Request.Builder().url("https://developers.zomato.com/api/v2.1/search?entity_id="+entity_id+"&entity_type="+entity_type)
@@ -66,16 +67,15 @@ public class ZomatoController {
 		JSONObject restuarnts_json = (JSONObject) parse.parse(restuarnts_response.body().string());
 		JSONArray restaurants = (JSONArray) restuarnts_json.get("restaurants");
 		JSONObject restuarnt_obj=null;
-		//Long a = (Long) jobj1.get("results_found");
-		System.out.println("1");
     	for (int j = 0; j < restaurants.size(); j++) {
+    		
 			JSONObject restaurant = (JSONObject) restaurants.get(j);
 			 restuarnt_obj = (JSONObject) restaurant.get("restaurant");
 			String c = (String) restuarnt_obj.get("name");
 			JSONObject location =  (JSONObject) restuarnt_obj.get("location");
-			//JSONObject city_location = (JSONObject) location.get(0);
 		restuarntLocation=new RestuarntLocation((String) location.get("address"),(String)location.get("locality"),(String)location.get("city"),
 				(String)location.get("latitude"),(String)location.get("locality_verbose"),(String)location.get("longitude"),(String)location.get("zipcode"));
+		Restuarant restuarnt=null;
 		restuarnt=new Restuarant((String) restuarnt_obj.get("id"),restuarntLocation,(String) restuarnt_obj.get("name"),
 		(String)restuarnt_obj.get("timings"),(long) restuarnt_obj.get("average_cost_for_two"),(String) restuarnt_obj.get("currency"),(String) restuarnt_obj.get("phone_numbers"),(String) restuarnt_obj.get("thumb"));
 		System.out.println("2");
@@ -94,6 +94,8 @@ public class ZomatoController {
 	
 	@GetMapping("/restuarant/{rname}")
 	public List<Restuarant> getRestuarant(@PathVariable String rname) throws IOException, ParseException {
+		List<Restuarant> restuarntList=new ArrayList<>();
+
 		Request restuarnts_request = new Request.Builder().url("https://developers.zomato.com/api/v2.1/search?q=" + rname)		
 				.get().addHeader("user-key", "d120fd8c59ef08ab5b584772b0ea8a6d").build();
 		Response restuarnts_response = client.newCall(restuarnts_request).execute();
