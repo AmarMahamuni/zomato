@@ -1,5 +1,6 @@
 package com.zomato.controller;
 
+import java.io.Console;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +41,10 @@ public class ZomatoController {
 	
 
 	OkHttpClient client = new OkHttpClient();
-
+	List<Restuarant> restuarntList=new ArrayList<>();
 	@GetMapping("/list/{city}")
-	public JSONObject getCityDetails(@PathVariable String city) throws IOException, ParseException {
+	public List<Restuarant> getCityDetails(@PathVariable String city) throws IOException, ParseException {
+		
 		
 		String entity_type = null;
 		Long entity_id = null;
@@ -65,23 +67,29 @@ public class ZomatoController {
 		JSONArray restaurants = (JSONArray) restuarnts_json.get("restaurants");
 		JSONObject restuarnt_obj=null;
 		//Long a = (Long) jobj1.get("results_found");
+		System.out.println("1");
     	for (int j = 0; j < restaurants.size(); j++) {
 			JSONObject restaurant = (JSONObject) restaurants.get(j);
 			 restuarnt_obj = (JSONObject) restaurant.get("restaurant");
 			String c = (String) restuarnt_obj.get("name");
-			System.out.println(c);
-			//System.out.println(b.get("include_bogo_offers"));
-
+			JSONObject location =  (JSONObject) restuarnt_obj.get("location");
+			//JSONObject city_location = (JSONObject) location.get(0);
+		restuarntLocation=new RestuarntLocation((String) location.get("address"),(String)location.get("locality"),(String)location.get("city"),
+				(String)location.get("latitude"),(String)location.get("locality_verbose"),(String)location.get("longitude"),(String)location.get("zipcode"));
+		restuarnt=new Restuarant((String) restuarnt_obj.get("id"),restuarntLocation,(String) restuarnt_obj.get("name"),
+		(String)restuarnt_obj.get("timings"),(long) restuarnt_obj.get("average_cost_for_two"),(String) restuarnt_obj.get("currency"),(String) restuarnt_obj.get("phone_numbers"),(String) restuarnt_obj.get("thumb"));
+		System.out.println("2");
+		System.out.println((String) restuarnt_obj.get("name"));
+		System.out.println((String)restuarnt_obj.get("timings"));
+		restuarntList.add(restuarnt);
 		}
-    	
-
 		
-		return restuarnt_obj;
+		return restuarntList;
 
 	}
 	RestuarntLocation restuarntLocation=null;
 	Restuarant restuarnt=null;
-	List<Restuarant> restuarntList=new ArrayList<>();
+	
 	
 	
 	@GetMapping("/restuarant/{rname}")
