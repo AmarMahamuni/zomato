@@ -9,6 +9,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +22,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 public class ZomatoController {
 
@@ -79,13 +82,14 @@ public class ZomatoController {
 	RestuarntLocation restuarntLocation=null;
 	Restuarant restuarnt=null;
 	List<Restuarant> restuarntList=new ArrayList<>();
+	
+	
 	@GetMapping("/restuarant/{rname}")
 	public List<Restuarant> getRestuarant(@PathVariable String rname) throws IOException, ParseException {
 		Request restuarnts_request = new Request.Builder().url("https://developers.zomato.com/api/v2.1/search?q=" + rname)		
 				.get().addHeader("user-key", "d120fd8c59ef08ab5b584772b0ea8a6d").build();
 		Response restuarnts_response = client.newCall(restuarnts_request).execute();
 		JSONParser parse = new JSONParser();
-System.out.println(rname);
 		JSONObject restuarnts_json = (JSONObject) parse.parse(restuarnts_response.body().string());
 		JSONArray restaurants = (JSONArray) restuarnts_json.get("restaurants");
 		JSONObject restuarnt_obj=null;
@@ -101,6 +105,7 @@ System.out.println(rname);
 		restuarnt=new Restuarant((String) restuarnt_obj.get("id"),restuarntLocation,(String) restuarnt_obj.get("name"),
 		(String)restuarnt_obj.get("timings"),(long) restuarnt_obj.get("average_cost_for_two"),(String) restuarnt_obj.get("currency"),(String) restuarnt_obj.get("phone_numbers"),(String) restuarnt_obj.get("thumb"));
 		System.out.println((String) restuarnt_obj.get("name"));
+		System.out.println((String)restuarnt_obj.get("timings"));
 		restuarntList.add(restuarnt);
 		}
 		
